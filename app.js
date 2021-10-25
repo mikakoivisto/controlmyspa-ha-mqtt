@@ -42,6 +42,7 @@ function startMqtt(mqttClient, spa) {
       }
       await discovery(mqttClient, spa)
       await sleep(5)
+      online(mqttClient, spa)
       updateData(mqttClient, spa)
   })
 
@@ -116,11 +117,16 @@ async function discovery(mqttClient, spa) {
     "min_temp":"10",
     "max_temp":"40",
     "temp_step":"0.5",
-    "modes":["REST", "READY"]
+    "modes":["off", "heat"]
   }
 
   console.log(JSON.stringify(discoveryMessage))
   mqttClient.publish("homeassistant/climate/"+ entityId + "/config", JSON.stringify(discoveryMessage), { qos: 1 })
+}
+
+function online(mqttClient, spa) {
+  let entityId = "spa_" + spa.currentSpa._id 
+  mqttClient.publish("homeassistant/climate/" + entityId + "/available", "online")
 }
 
 function updateData(mqttClient, spa) {
