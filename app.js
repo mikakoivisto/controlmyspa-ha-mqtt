@@ -132,7 +132,7 @@ function online(mqttClient, spa) {
 function updateData(mqttClient, spa) {
   spa.getSpa()
   let payload = {
-    "mode": spa.currentSpa.currentState.heaterMode,
+    "mode": spa.currentSpa.currentState.heaterMode == "REST" ? "off" : "heat",
     "target_temp": spa.currentSpa.currentState.desiredTemp,
     "current_temp": spa.currentSpa.currentState.currentTemp,
   }
