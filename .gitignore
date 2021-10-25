@@ -1,0 +1,6 @@
+.idea
+node_modules
+.eslintrc.json
+config.json
+.DS_Store
+docker.env

@@ -1,0 +1,7 @@
+{
+    "main": "app.js",
+    "dependencies": {
+        "mqtt": "^4.2.8",
+        "controlmyspajs": "^0.1.15"
+    }
+}

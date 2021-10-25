@@ -1,0 +1,15 @@
+version: "3.4"
+services:
+  mqtt:
+    image: eclipse-mosquitto
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./mosquitto/config.conf:/mosquitto/config/mosquitto.conf
+  controlmyspa-mqtt:
+    image: controlmyspa-ha-mqtt
+    build:
+      context: .
+    links:
+      - mqtt
+    env_file: 
+      - docker.env
