@@ -91,13 +91,15 @@ async function initConfig(configFile) {
           "mqtt_user": process.env.MQTTUSER,
           "mqtt_pass": process.env.MQTTPASSWORD,
           "controlmyspa_user": process.env.CONTROLMYSPA_USER,
-          "controlmyspa_pass": process.env.CONTROLMYSPA_PASS
+          "controlmyspa_pass": process.env.CONTROLMYSPA_PASS,
+          "poll_interval": process.env.CONTROLMYSPA_POLL_INTERVAL
       }
   }
     // If there's no configured settings, force some defaults.
   CONFIG.host = CONFIG.host ? CONFIG.host : 'localhost'
   CONFIG.port = CONFIG.port ? CONFIG.port : '1883'
   CONFIG.hass_topic = CONFIG.hass_topic ? CONFIG.hass_topic : 'homeassistant/status'
+  CONFIG.poll_interval = CONFIG.poll_interval ? CONFIG.poll_interval : 60
 }
 
 async function discovery(mqttClient, spa) {
@@ -143,7 +145,7 @@ function updateData(mqttClient, spa) {
   console.log(JSON.stringify(payload))
   let entityId = "spa_" + spa.currentSpa._id 
   mqttClient.publish("homeassistant/climate/" + entityId + "/state", JSON.stringify(payload))
-  setTimeout(function() { updateData(mqttClient, spa)}, 10*1000)
+  setTimeout(function() { updateData(mqttClient, spa)}, CONFIG.poll_interval*1000)
 }
 
 // Main code loop
