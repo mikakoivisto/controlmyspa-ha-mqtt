@@ -62,6 +62,7 @@ function startMqtt(mqttClient, spa) {
 
   // Process MQTT messages from subscribed command topics
   mqttClient.on('message', async function (topic, message) {
+    console.log(topic + ": " + message)
       //processMqttMessage(topic, message, mqttClient, spa)
   })
 }
@@ -103,17 +104,17 @@ async function discovery(mqttClient, spa) {
   let entityId = "spa_" + spa.currentSpa._id  
   let discoveryMessage = {
     "name": "ControlMySpa " + spa.currentSpa._id,
-    "mode_cmd_t":"homeassistant/climate/" + entityId + "/thermostatModeCmd",
+    "mode_cmd_t":"homeassistant/climate/" + entityId + "/mode_command",
     "mode_stat_t":"homeassistant/climate/" + entityId + "/state",
-    "mode_stat_tpl":"",
+    "mode_stat_tpl":"{{ value_json.mode}}",
     "avty_t":"homeassistant/climate/" + entityId + "/available",
     "pl_avail":"online",
     "pl_not_avail":"offline",
-    "temp_cmd_t":"homeassistant/climate/" + entityId + "/targetTempCmd",
+    "temp_cmd_t":"homeassistant/climate/" + entityId + "/target_temp_command",
     "temp_stat_t":"homeassistant/climate/" + entityId + "/state",
-    "temp_stat_tpl":"",
+    "temp_stat_tpl":"{{ value_json.target_temp}}",
     "curr_temp_t":"homeassistant/climate/" + entityId + "/state",
-    "curr_temp_tpl":"",
+    "curr_temp_tpl":"{{value_json.current_temp}}",
     "min_temp":"10",
     "max_temp":"40",
     "temp_step":"0.5",
@@ -122,6 +123,8 @@ async function discovery(mqttClient, spa) {
 
   console.log(JSON.stringify(discoveryMessage))
   mqttClient.publish("homeassistant/climate/"+ entityId + "/config", JSON.stringify(discoveryMessage), { qos: 1 })
+  mqttClient.subscribe("homeassistant/climate/" + entityId + "/target_temp_command")
+  mqttClient.subscribe("homeassistant/climate/" + entityId + "/mode_command")
 }
 
 function online(mqttClient, spa) {
