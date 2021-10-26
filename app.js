@@ -158,12 +158,17 @@ async function processMqttMessage(topic, message, mqttClient, spa) {
     if (topic.endsWith("/mode_command")) {
       spa.getSpa()
       if (spa.currentSpa.currentState.heaterMode == "REST" && message == "heat") {
-        console.log("REST => READY")
+        console.log("Toggle heater mode REST => READY")
         await spa.toggleHeaterMode()
       } else if (spa.currentSpa.currentState.heaterMode == "READY" && message == "off") {
-        console.log("READY => REST")
+        console.log("Toggle heater mode READY => REST")
         await spa.toggleHeaterMode()
+      } else {
+        console.log("Current heater mode already " + spa.currentSpa.currentState.heaterMode)
       }
+    } else if (topic.endsWith("/target_temp_command")) {
+      console.log("Set spa temp to " + message)
+      spa.setTemp(message)
     } else {
       console.log(topic + ": " + message)
     }
