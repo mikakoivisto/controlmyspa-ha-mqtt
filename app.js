@@ -148,6 +148,26 @@ function updateData(mqttClient, spa) {
   setTimeout(function() { updateData(mqttClient, spa)}, CONFIG.poll_interval*1000)
 }
 
+async function processMqttMessage(topic, messsage, mqttClient, spa) {
+  message = message.toString()
+  if (topic === CONFIG.hass_topic || topic === 'hass/status' || topic === 'hassio/status') {
+    if (message == 'online') {
+      console.log("Home assistant restart detected")
+      discovery(mqttClient, spa)
+    }
+  } else {
+    if (topic.endsWith("/mode_command")) {
+      spa.getSpa()
+      if (spa.currentSpa.currentState.heaterMode == "REST" && message == "heat") {
+        await spa.toggleHeaterMode()
+      } else if (spa.currentSpa.currentState.heaterMode == "READY" && message == "off") {
+        await spa.toggleHeaterMode()
+      }
+    }
+    updateData(mqttClient, spa)
+  }
+}
+
 // Main code loop
 const main = async() => {
   let configFile = './config.json'
