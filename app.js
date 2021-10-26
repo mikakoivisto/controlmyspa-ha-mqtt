@@ -134,7 +134,7 @@ function online(mqttClient, spa) {
 }
 
 function updateData(mqttClient, spa) {
-  spa.getSpa()
+  await spa.getSpa()
   let payload = {
     "mode": spa.currentSpa.currentState.heaterMode == "REST" ? "off" : "heat",
     "target_temp": spa.currentSpa.currentState.desiredTemp,
@@ -156,7 +156,7 @@ async function processMqttMessage(topic, message, mqttClient, spa) {
     }
   } else {
     if (topic.endsWith("/mode_command")) {
-      spa.getSpa()
+      await spa.getSpa()
       if (spa.currentSpa.currentState.heaterMode == "REST" && message == "heat") {
         console.log("Toggle heater mode REST => READY")
         await spa.toggleHeaterMode()
@@ -168,10 +168,12 @@ async function processMqttMessage(topic, message, mqttClient, spa) {
       }
     } else if (topic.endsWith("/target_temp_command")) {
       console.log("Set spa temp to " + message)
-      spa.setTemp(message)
+      await spa.setTemp(message)
     } else {
       console.log(topic + ": " + message)
     }
+    updateData(mqttClient, spa)
+    sleep(5)
     updateData(mqttClient, spa)
   }
 }
