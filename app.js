@@ -62,8 +62,7 @@ function startMqtt(mqttClient, spa) {
 
   // Process MQTT messages from subscribed command topics
   mqttClient.on('message', async function (topic, message) {
-    console.log(topic + ": " + message)
-      //processMqttMessage(topic, message, mqttClient, spa)
+    processMqttMessage(topic, message, mqttClient, spa)
   })
 }
 
@@ -148,7 +147,7 @@ function updateData(mqttClient, spa) {
   setTimeout(function() { updateData(mqttClient, spa)}, CONFIG.poll_interval*1000)
 }
 
-async function processMqttMessage(topic, messsage, mqttClient, spa) {
+async function processMqttMessage(topic, message, mqttClient, spa) {
   message = message.toString()
   if (topic === CONFIG.hass_topic || topic === 'hass/status' || topic === 'hassio/status') {
     if (message == 'online') {
