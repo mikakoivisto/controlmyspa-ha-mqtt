@@ -158,10 +158,14 @@ async function processMqttMessage(topic, message, mqttClient, spa) {
     if (topic.endsWith("/mode_command")) {
       spa.getSpa()
       if (spa.currentSpa.currentState.heaterMode == "REST" && message == "heat") {
+        console.log("REST => READY")
         await spa.toggleHeaterMode()
       } else if (spa.currentSpa.currentState.heaterMode == "READY" && message == "off") {
+        console.log("READY => REST")
         await spa.toggleHeaterMode()
       }
+    } else {
+      console.log(topic + ": " + message)
     }
     updateData(mqttClient, spa)
   }
@@ -184,6 +188,7 @@ const main = async() => {
   controlMySpaClient = new ControlMySpa(CONFIG.controlmyspa_user, CONFIG.controlmyspa_pass)
 
   await controlMySpaClient.init()
+  controlMySpaClient.waitForResult = true
  
   // Initiate connection to MQTT broker
   try {
