@@ -159,7 +159,7 @@ function updateData(mqttClient, spa) {
 function updateLogin(spa) {
   console.log("Updating login tokens")
   try {
-    await spa.login()
+    spa.login()
     console.log("Token expires in " + spa.tokenData.expires_in)
   } catch (e) {
     console.log(e)
