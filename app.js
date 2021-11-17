@@ -44,6 +44,7 @@ function startMqtt(mqttClient, spa) {
       await sleep(5)
       online(mqttClient, spa)
       updateData(mqttClient, spa)
+      setTimeout(function() {updateLogin(spa)}, spa.tokenData.expires_in - 300)
   })
 
   mqttClient.on('reconnect', function () {
@@ -134,17 +135,36 @@ function online(mqttClient, spa) {
 }
 
 function updateData(mqttClient, spa) {
-  await spa.getSpa()
-  let payload = {
-    "mode": spa.currentSpa.currentState.heaterMode == "REST" ? "off" : "heat",
-    "target_temp": spa.currentSpa.currentState.desiredTemp,
-    "current_temp": spa.currentSpa.currentState.currentTemp,
-  }
+  try {
+    await spa.getSpa()
+    let payload = {
+      "mode": spa.currentSpa.currentState.heaterMode == "REST" ? "off" : "heat"
+    }
+    try {
+      payload.target_temp = parseFloat(spa.currentSpa.currentState.desiredTemp).toFixed(1)
+    } catch (e) {}
+    try {
+      payload.current_temp = parseFloat(spa.currentSpa.currentState.currentTemp).toFixed(1)
+    } catch (e) {}
 
-  console.log(JSON.stringify(payload))
-  let entityId = "spa_" + spa.currentSpa._id 
-  mqttClient.publish("homeassistant/climate/" + entityId + "/state", JSON.stringify(payload))
+    console.log(JSON.stringify(payload))
+    let entityId = "spa_" + spa.currentSpa._id 
+    mqttClient.publish("homeassistant/climate/" + entityId + "/state", JSON.stringify(payload))
+  } catch (e) {
+    console.log(e)
+  }
   setTimeout(function() { updateData(mqttClient, spa)}, CONFIG.poll_interval*1000)
+}
+
+function updateLogin(spa) {
+  console.log("Updating login tokens")
+  try {
+    await spa.login()
+    console.log("Token expires in " + spa.tokenData.expires_in)
+  } catch (e) {
+    console.log(e)
+  }
+  setTimeout(function() {updateLogin(spa)}, spa.tokenData.expires_in - 300)
 }
 
 async function processMqttMessage(topic, message, mqttClient, spa) {
