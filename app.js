@@ -44,7 +44,7 @@ function startMqtt(mqttClient, spa) {
       await sleep(5)
       online(mqttClient, spa)
       updateData(mqttClient, spa)
-      setTimeout(function() {updateLogin(spa)}, spa.tokenData.expires_in - 300)
+      setTimeout(function() {updateLogin(spa)}, (spa.tokenData.expires_in - 300)*1000)
   })
 
   mqttClient.on('reconnect', function () {
@@ -164,7 +164,7 @@ function updateLogin(spa) {
   } catch (e) {
     console.log(e)
   }
-  setTimeout(function() {updateLogin(spa)}, spa.tokenData.expires_in - 300)
+  setTimeout(function() {updateLogin(spa)}, (spa.tokenData.expires_in - 300)*1000)
 }
 
 async function processMqttMessage(topic, message, mqttClient, spa) {
