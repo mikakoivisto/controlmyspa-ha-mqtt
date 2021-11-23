@@ -120,6 +120,7 @@ async function discovery(mqttClient, spa) {
     "min_temp":"10",
     "max_temp":"40",
     "temp_step":"0.5",
+    "temperature_unit":"C",  
     "modes":["off", "heat"]
   }
 
