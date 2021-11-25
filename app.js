@@ -99,7 +99,7 @@ async function initConfig(configFile) {
   CONFIG.host = CONFIG.host ? CONFIG.host : 'localhost'
   CONFIG.port = CONFIG.port ? CONFIG.port : '1883'
   CONFIG.hass_topic = CONFIG.hass_topic ? CONFIG.hass_topic : 'homeassistant/status'
-  CONFIG.poll_interval = CONFIG.poll_interval ? CONFIG.poll_interval : 60
+  CONFIG.poll_interval = CONFIG.poll_interval ? CONFIG.poll_interval : 120
 }
 
 async function discovery(mqttClient, spa) {
