@@ -198,7 +198,6 @@ async function processMqttMessage(topic, message, mqttClient, spa) {
     } else {
       console.log(topic + ": " + message)
     }
-    updateData(mqttClient, spa)
     sleep(5)
     updateData(mqttClient, spa)
   }
