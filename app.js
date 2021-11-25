@@ -142,12 +142,12 @@ function updateData(mqttClient, spa) {
       "mode": spa.currentSpa.currentState.heaterMode == "REST" ? "off" : "heat"
     }
     try {
-      payload.target_temp = parseFloat(spa.currentSpa.currentState.desiredTemp).toFixed(1)
+      payload.target_temp = spa.currentSpa.currentState.desiredTemp
       if (isNaN(payload.target_temp)) payload.target_temp = undefined  
     } catch (e) {}
     try {
-      payload.current_temp = parseFloat(spa.currentSpa.currentState.currentTemp).toFixed(1)
-      if (isNaN(payload.currnet_temp)) payload.current_temp = undefined  
+      payload.current_temp = spa.currentSpa.currentState.currentTemp
+      if (isNaN(payload.current_temp)) payload.current_temp = undefined  
     } catch (e) {}
 
     console.log(JSON.stringify(payload))
