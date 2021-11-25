@@ -143,9 +143,11 @@ function updateData(mqttClient, spa) {
     }
     try {
       payload.target_temp = parseFloat(spa.currentSpa.currentState.desiredTemp).toFixed(1)
+      if (isNaN(payload.target_temp)) payload.target_temp = undefined  
     } catch (e) {}
     try {
       payload.current_temp = parseFloat(spa.currentSpa.currentState.currentTemp).toFixed(1)
+      if (isNaN(payload.currnet_temp)) payload.current_temp = undefined  
     } catch (e) {}
 
     console.log(JSON.stringify(payload))
@@ -174,6 +176,9 @@ async function processMqttMessage(topic, message, mqttClient, spa) {
     if (message == 'online') {
       console.log("Home assistant restart detected")
       discovery(mqttClient, spa)
+      online(mqtt, spa)
+      sleep(5)
+      updateData(mqttClient, spa)
     }
   } else {
     if (topic.endsWith("/mode_command")) {
