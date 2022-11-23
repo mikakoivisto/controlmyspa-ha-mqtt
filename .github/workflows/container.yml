@@ -16,4 +16,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: mikakoivisto/controlmyspa-mqtt:latest,mikakoivisto/controlmyspa-ha-mqtt:${{ github.sha }}
+        tags: mikakoivisto/controlmyspa-ha-mqtt:latest,mikakoivisto/controlmyspa-ha-mqtt:${{ github.sha }}
