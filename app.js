@@ -166,6 +166,7 @@ class App extends EventEmitter {
     self.spaSensorDiscovery(self.spa);
     self.sensorsDiscovery(self.spa);
     self.climateDiscovery(self.spa);
+    self.panelLockDiscovery(self.spa);
     self.spa.getLights().forEach(light => {
       self.componentSwitchDiscovery(self.spa, light, "light", "mdi:lightbulb");
       self.componentBinarySensorDiscovery(self.spa, light, "light", "mdi:lightbulb", "HIGH");
@@ -297,7 +298,7 @@ class App extends EventEmitter {
       "unique_id": uniqueId,
       "object_id": objectId,
       "name": name,
-      "icon": "mdi:bathtub",
+      "icon": "mdi:hot-tub",
       "state_topic": stateTopic,
       "value_template": "{% if value_json.online is defined and value_json.online %} Online {% else %} Offline {% endif %}",
       "json_attributes_topic": stateTopic,
@@ -318,6 +319,32 @@ class App extends EventEmitter {
     self.modeSensorDiscovery(spa, "Temperature Range", "mdi:thermometer-lines", "tempRange", "HIGH", "LOW");
     self.buttonDiscovery(spa, "Toggle Heater Mode", "mdi:radiator", "heaterMode", "TOGGLE");
     self.buttonDiscovery(spa, "Refresh", "mdi:sync", "refresh", "REFRESH");
+  }
+
+  panelLockDiscovery(spa) {
+    let self = this;
+    let spaId = spa.getSpaId();
+    let stateTopic = `controlmyspa/${spaId}/spa`;
+    let commandTopic = `controlmyspa/${spaId}/panelLock`;
+    let objectId = `controlmyspa_${spaId}_panel_lock`;
+    let uniqueId = `${objectId}_lock`;
+
+    let config = {
+      "unique_id": uniqueId,
+      "object_id": objectId,
+      "name": "Panel",
+      "state_topic": stateTopic,
+      "command_topic": commandTopic,
+      "payload_lock": "LOCK",
+      "payload_unlock": "UNLOCK",
+      "state_locked": "LOCK",
+      "state_unlocked": "UNLOCK",
+      "value_template": "{% if value_json.panelLocked %}LOCK{% else %}UNLOCK{%endif%}",
+      "qos": 1,
+      "availability": self.getAvailabilityDiscovery(spa),
+      "device": self.getDeviceDiscovery(spa)
+    };
+    self.mqtt.publish("homeassistant/lock/" + objectId + "/config", JSON.stringify(config), { retain: true });
   }
 
   temperatureSensorDiscovery(spa, name, attribute, celsius) {
@@ -437,7 +464,7 @@ class App extends EventEmitter {
       "unique_id": uniqueId,
       "object_id": objectId,
       "name": name,
-      "icon": "mdi:bathtub",
+      "icon": "mdi:hot-tub",
       "modes": modes,
       "mode_command_topic": modeCommandTopic,
       "mode_state_topic": stateTopic,
@@ -525,7 +552,7 @@ class App extends EventEmitter {
 
   setPanelLock(payload) {
     let self = this;
-    self.spa
+    self.spa.setPanelLock(payload === 'LOCK');
   }
 
   setLightState(id, payload) {
