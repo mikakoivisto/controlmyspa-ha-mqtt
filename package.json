@@ -1,7 +1,9 @@
 {
-    "main": "app.js",
-    "dependencies": {
-        "mqtt": "^4.2.8",
-        "controlmyspajs": "^0.1.15"
-    }
+  "main": "app.js",
+  "dependencies": {
+    "debug": "^4.3.4",
+    "events": "^3.3.0",
+    "mqtt": "^4.2.8",
+    "controlmyspajs": "^0.1.15"
+  }
 }
