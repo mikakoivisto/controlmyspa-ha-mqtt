@@ -81,8 +81,9 @@ class App extends EventEmitter {
     });
 
     self.spa.on('initialized', () => {
-      logDebug("Spa initialized")
+      logInfo("Spa initialized")
       self.setupSubscriptions();
+      self.discovery();
     });
 
     self.spa.on('status_updated', () => {
@@ -161,6 +162,7 @@ class App extends EventEmitter {
 
   discovery() {
     let self = this;
+    logInfo("Starting mqtt discovery");
     self.spaSensorDiscovery(self.spa);
     self.sensorsDiscovery(self.spa);
     self.climateDiscovery(self.spa);
@@ -188,6 +190,7 @@ class App extends EventEmitter {
     self.spa.getFilters().forEach(filter => {
       self.componentSensorDiscovery(self.spa, filter, "filter", "mdi:air-filter", "ON", "OFF", "DISABLED");
     });
+    logInfo("Ending mqtt discovery");
   }
 
   componentSwitchDiscovery(spa, component, type, icon) {
