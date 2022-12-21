@@ -1,0 +1,31 @@
+name: "ControlMySpa HA MQTT"
+description: "ControlMySpa MQTT Bridge"
+version: "1.0.0"
+slug: "controlmyspa_ha_mqtt"
+init: false
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+options:
+  mqtt_host:
+  mqtt_port:
+  mqtt_user:
+  mqtt_pass:
+  controlmyspa_user:
+  controlmyspa_pass: "world"
+  controlmyspa_celsius: false
+  hass_topic: homeassistant/status
+  debug: app:info,*:error,spa:info
+schema:
+  mqtt_host: str
+  mqtt_port: int
+  mqtt_user: str
+  mqtt_pass: str
+  controlmyspa_user: str
+  controlmyspa_pass: str
+  controlmyspa_celsius: bool
+  hass_topic: str
+  debug: str
