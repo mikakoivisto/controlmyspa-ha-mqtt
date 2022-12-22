@@ -16,7 +16,7 @@ const config = {
   hassTopic: process.env.HASSTOPIC || 'homeassistant/status',
   spaUser: process.env.CONTROLMYSPA_USER,
   spaPassword: process.env.CONTROLMYSPA_PASS,
-  useCelsius: process.env.CONTROLMYSPA_CELSIUS || true,
+  useCelsius: process.env.CONTROLMYSPA_CELSIUS === 'false' ? false : true,
   refreshSpa: process.env.REFRESH_SPA || 10
 }
 

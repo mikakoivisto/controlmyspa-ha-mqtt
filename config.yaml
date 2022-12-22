@@ -1,6 +1,6 @@
 name: "ControlMySpa HA MQTT"
 description: "ControlMySpa MQTT Bridge"
-version: "1.0.5"
+version: "1.0.6"
 slug: "controlmyspa_ha_mqtt"
 init: false
 arch:
