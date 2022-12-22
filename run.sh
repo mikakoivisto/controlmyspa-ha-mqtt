@@ -1,9 +1,9 @@
 #!/usr/bin/with-contenv bashio
 
-export MQTTHOST=$(bashio::services mqtt "host")
-export MQTTPORT=$(bashio::services mqtt "port")
-export MQTTUSER=$(bashio::services mqtt "username")
-export MQTTPASS=$(bashio::services mqtt "password")
+export MQTTHOST=$(bashio::config 'mqtt_host')
+export MQTTPORT=$(bashio::config 'mqtt_port')
+export MQTTUSER=$(bashio::config 'mqtt_user')
+export MQTTPASS=$(bashio::config 'mqtt_pass')
 export CONTROLMYSPA_USER=$(bashio::config 'controlmyspa_user')
 export CONTROLMYSPA_PASS=$(bashio::config 'controlmyspa_pass')
 export CONTROLMYSPA_CELSIUS=$(bashio::config 'controlmyspa_celsius')
