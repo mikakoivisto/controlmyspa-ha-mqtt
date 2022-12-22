@@ -1,6 +1,6 @@
 name: "ControlMySpa HA MQTT"
 description: "ControlMySpa MQTT Bridge"
-version: "1.0.6"
+version: "1.0.7"
 slug: "controlmyspa_ha_mqtt"
 init: false
 arch:
@@ -19,6 +19,7 @@ options:
   controlmyspa_celsius: false
   hass_topic: homeassistant/status
   debug: app:info,*:error,spa:info
+  refresh_spa: 5
 schema:
   mqtt_host: str
   mqtt_port: int
@@ -29,3 +30,4 @@ schema:
   controlmyspa_celsius: bool
   hass_topic: str
   debug: str
+  refresh_spa: int

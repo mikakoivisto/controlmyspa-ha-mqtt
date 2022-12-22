@@ -9,5 +9,6 @@ export CONTROLMYSPA_PASS=$(bashio::config 'controlmyspa_pass')
 export CONTROLMYSPA_CELSIUS=$(bashio::config 'controlmyspa_celsius')
 export HASSTOPIC=$(bashio::config 'hass_topic')
 export DEBUG=$(bashio::config 'debug')
+export REFRESH_SPA=$(bashio::config 'refresh_spa')
 
 node app.js

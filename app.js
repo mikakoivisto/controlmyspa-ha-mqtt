@@ -17,7 +17,7 @@ const config = {
   spaUser: process.env.CONTROLMYSPA_USER,
   spaPassword: process.env.CONTROLMYSPA_PASS,
   useCelsius: process.env.CONTROLMYSPA_CELSIUS === 'false' ? false : true,
-  refreshSpa: process.env.REFRESH_SPA || 10
+  refreshSpa: process.env.REFRESH_SPA ? +process.env.REFRESH_SPA : 10
 }
 
 logDebug(JSON.stringify(config));
