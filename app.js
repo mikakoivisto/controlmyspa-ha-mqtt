@@ -29,8 +29,6 @@ class App extends EventEmitter {
   constructor(config) {
     super();
 
-    console.log(config)
-
     this.mqtt = mqttApi.connect({
       host: config.mqttHost,
       port: config.mqttPort,
