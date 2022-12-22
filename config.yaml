@@ -15,7 +15,7 @@ options:
   mqtt_user:
   mqtt_pass:
   controlmyspa_user:
-  controlmyspa_pass: "world"
+  controlmyspa_pass:
   controlmyspa_celsius: false
   hass_topic: homeassistant/status
   debug: app:info,*:error,spa:info
