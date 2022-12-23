@@ -1,5 +1,5 @@
 {
   "name": "ControlMySpa MQTT Repository",
-  "url": "https://github.com/jkrall/controlmyspa-ha-mqtt",
-  "maintainer": "Joshua Krall"
+  "url": "https://github.com/mikakoivisto/controlmyspa-ha-mqtt",
+  "maintainer": "Mika Koivisto"
 }
