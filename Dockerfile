@@ -1,4 +1,4 @@
-ARG BUILD_FROM
+ARG BUILD_FROM=node:18-alpine
 FROM $BUILD_FROM
 
 # Install requirements for add-on
