@@ -1,4 +1,4 @@
-ARG BUILD_FROM=node:18-alpine
+ARG BUILD_FROM=ghcr.io/hassio-addons/base:13.0.0
 FROM $BUILD_FROM
 
 # Install requirements for add-on
@@ -10,6 +10,6 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 COPY . .
-RUN chmod a+x /usr/src/app/run.sh
+RUN chmod a+x run.sh
 
-CMD [ "/usr/src/app/run.sh" ]
+CMD [ "run.sh" ]
