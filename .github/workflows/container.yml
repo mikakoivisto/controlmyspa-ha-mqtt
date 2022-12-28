@@ -15,5 +15,6 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: .
+        file: Dockerfile-standalone
         push: true
         tags: mikakoivisto/controlmyspa-ha-mqtt:latest,mikakoivisto/controlmyspa-ha-mqtt:${{ github.sha }}

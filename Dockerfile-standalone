@@ -1,0 +1,9 @@
+ARG BUILD_FROM=node:18-alpine
+FROM $BUILD_FROM
+
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm install
+COPY . .
+
+CMD [ "node", "app.js" ]
