@@ -12,4 +12,4 @@ RUN npm install
 COPY . .
 RUN chmod a+x run.sh
 
-CMD [ "run.sh" ]
+CMD [ "/usr/src/app/run.sh" ]
