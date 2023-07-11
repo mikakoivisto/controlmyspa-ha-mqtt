@@ -6,6 +6,33 @@ const logDebug = require('debug')('app:debug');
 const logError = require('debug')('app:error');
 const logInfo = require('debug')('app:info');
 
+
+// Override axios CA certificate, used by ControlMySpa
+// required because iot.controlmyspa.com is misconfigured and is not serving the full certificate chain
+const axios = require("axios");
+const fs = require("fs");
+const https = require("https");
+const path = require("path");
+const { URL } = require('url');
+const ca = fs.readFileSync(path.resolve(__dirname, "./fullchain.pem"), "utf8");
+axios.interceptors.request.use(
+  (config) => {
+    const hostname = new URL(config.url).hostname;
+    if (hostname.endsWith('controlmyspa.com')) {    
+      config.httpsAgent = new https.Agent({
+        rejectUnauthorized: true, // This is the default value, you can skip it
+        ca,
+      });
+    }
+    return config;
+  },
+  (error) => {
+    // Do something with request error
+    return Promise.reject(error);
+  }
+);
+
+
 logInfo.log = console.log.bind(console);
 
 const config = {
