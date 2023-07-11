@@ -10,5 +10,6 @@ export CONTROLMYSPA_CELSIUS=$(bashio::config 'controlmyspa_celsius')
 export HASSTOPIC=$(bashio::config 'hass_topic')
 export DEBUG=$(bashio::config 'debug')
 export REFRESH_SPA=$(bashio::config 'refresh_spa')
+export NODE_TLS_REJECT_UNAUTHORIZED=$(bashio::config 'tls_reject_unauthorized')
 
 node app.js

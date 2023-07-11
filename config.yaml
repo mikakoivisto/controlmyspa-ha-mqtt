@@ -20,6 +20,7 @@ options:
   hass_topic: homeassistant/status
   debug: app:info,*:error,spa:info
   refresh_spa: 5
+  tls_reject_unauthorized: 1
 schema:
   mqtt_host: str
   mqtt_port: int
@@ -31,3 +32,4 @@ schema:
   hass_topic: str
   debug: str
   refresh_spa: int
+  tls_reject_unauthorized: int

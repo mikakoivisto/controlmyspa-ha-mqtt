@@ -45,9 +45,10 @@ CONTROLMYSPA_PASS=
 CONTROLMYSPA_CELSIUS=true
 HASSTOPIC=homeassistant/status
 DEBUG=app:info,*:error,spa:info
+NODE_TLS_REJECT_UNAUTHORIZED=1
 ```
 
-HASSTOPIC is important because mqtt discovery message is trigged by it. Default value should be fine. 
+HASSTOPIC is important because mqtt discovery message is trigged by it. Default value should be fine. If you have TLS errors in connecting to controlmyspa server you may need to set NODE_TLS_REJECT_UNAUTHORIZED=0.
 
 ## Known limitations
 
