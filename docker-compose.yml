@@ -9,6 +9,7 @@ services:
     image: controlmyspa-ha-mqtt
     build:
       context: .
+      dockerfile: Dockerfile-standalone
     links:
       - mqtt
     env_file: 

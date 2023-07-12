@@ -6,6 +6,8 @@ RUN \
   apk add --no-cache \
     python3 nodejs npm
 
+ENV NODE_EXTRA_CA_CERTS=/usr/src/app/controlmyspa-ca-fullchain.pem
+
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
