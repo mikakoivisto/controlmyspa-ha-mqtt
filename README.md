@@ -54,4 +54,4 @@ HASSTOPIC is important because mqtt discovery message is trigged by it. Default 
 
 This currently supports jets with HIGH and OFF state. If you have components the current implementation does not support I'll gladly discuss on how to add that support. 
 
-Tested with Novitek spa with Balboa jets. Implementation is based on ControlMySpaJs library https://gitlab.com/VVlasy/controlmyspajs
+Tested with Novitek spa with Balboa jets. Implementation is based on forked ControlMySpaJs library https://gitlab.com/VVlasy/controlmyspajs

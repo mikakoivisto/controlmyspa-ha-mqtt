@@ -1,4 +1,4 @@
-const ControlMySpa = require('controlmyspajs')
+const ControlMySpa = require('./lib/controlmyspajs')
 const EventEmitter = require('events');
 const mqttApi = require('mqtt');
 const Spa = require('./lib/spa');
