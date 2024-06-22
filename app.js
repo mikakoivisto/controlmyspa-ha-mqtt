@@ -39,13 +39,14 @@ class App extends EventEmitter {
     this.config = config;
     let spaClient = new ControlMySpa(config.spaUser, config.spaPassword, config.useCelsius);
     this.spa = new Spa(spaClient, config);
-    this.registerEventListeners();
     this.spa.init();
-
-    if (this.mqtt.connected) {
-      this.mqttConnected();
-    }
-    this.startPollers();
+    this.spa.on('initialized', () => {
+      this.registerEventListeners();
+      if (this.mqtt.connected) {
+        this.mqttConnected();
+      }
+      this.startPollers();
+    });
   }
 
   startPollers() {
