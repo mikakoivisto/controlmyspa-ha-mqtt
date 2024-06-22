@@ -41,9 +41,6 @@ class App extends EventEmitter {
     this.spa = new Spa(spaClient, config);
     this.registerSpaEventListeners();
     this.spa.init();
-    this.spa.on('initialized', () => {
-
-    });
   }
 
   startPollers() {
