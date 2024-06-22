@@ -201,13 +201,13 @@ class App extends EventEmitter {
     let name = `${type.charAt(0).toUpperCase()}${type.slice(1)}`.replace('_', ' ');
     let topicPrefix = `controlmyspa/${spaId}`;
     let componentTopic = `${topicPrefix}/${type}`;
-    let objectId = `controlmyspa_${spaId}_${type}`;
+    let objectId = `${spaId}_${type}`;
     if ("port" in component) {
       componentTopic += "/" + component.port;
       objectId += "_" + component.port;
       name += " " +  (parseInt(component.port) + 1)
     }
-    let uniqueId = `${objectId}_switch`;
+    let uniqueId = `controlmyspa_${objectId}_switch`;
 
     let config = {
       "unique_id": uniqueId,
@@ -232,13 +232,13 @@ class App extends EventEmitter {
     let name = `${type.charAt(0).toUpperCase()}${type.slice(1)}`.replace('_', ' ');
     let topicPrefix = `controlmyspa/${spaId}`;
     let stateTopic = `${topicPrefix}/${type}`;
-    let objectId = `controlmyspa_${spaId}_${type}`;
+    let objectId = `${spaId}_${type}`;
     if ("port" in component) {
       stateTopic += "/" + component.port;
       objectId += "_" + component.port;
       name += " " +  (parseInt(component.port) + 1)
     }
-    let uniqueId = `${objectId}_binary_sensor`;
+    let uniqueId = `controlmyspa_${objectId}_binary_sensor`;
 
     let config = {
       "unique_id": uniqueId,
@@ -265,13 +265,13 @@ class App extends EventEmitter {
     let name = `${type.charAt(0).toUpperCase()}${type.slice(1)}`.replace('_', ' ');
     let topicPrefix = `controlmyspa/${spaId}`;
     let stateTopic = `${topicPrefix}/${type}`;
-    let objectId = `controlmyspa_${spaId}_${type}`;
+    let objectId = `${spaId}_${type}`;
     if ("port" in component) {
       stateTopic += "/" + component.port;
       objectId += "_" + component.port;
       name += " " +  (parseInt(component.port) + 1)
     }
-    let uniqueId = `${objectId}_sensor`;
+    let uniqueId = `controlmyspa_${objectId}_sensor`;
     let valueTemplate = `{% if value_json.value == "${mode1}"%}${mode1Capitalized}{% elif value_json.value == "${mode2}" %}${mode2Capitalized}{% elif value_json.value == "${mode3}" %}${mode3Capitalized}{% else %}unknown{% endif %}`
     let config = {
       "unique_id": uniqueId,
@@ -292,8 +292,8 @@ class App extends EventEmitter {
     let name = 'Spa';
     let topicPrefix = `controlmyspa/${spaId}`;
     let stateTopic = `${topicPrefix}/spa`;
-    let objectId = `controlmyspa_${spaId}_spa`;
-    let uniqueId = `${objectId}_sensor`;
+    let objectId = `${spaId}_spa`;
+    let uniqueId = `controlmyspa_${objectId}_sensor`;
 
     let config = {
       "unique_id": uniqueId,
@@ -327,8 +327,8 @@ class App extends EventEmitter {
     let spaId = spa.getSpaId();
     let stateTopic = `controlmyspa/${spaId}/spa`;
     let commandTopic = `controlmyspa/${spaId}/panelLock`;
-    let objectId = `controlmyspa_${spaId}_panel_lock`;
-    let uniqueId = `${objectId}_lock`;
+    let objectId = `${spaId}_panel_lock`;
+    let uniqueId = `controlmyspa_${objectId}_lock`;
 
     let config = {
       "unique_id": uniqueId,
@@ -354,8 +354,8 @@ class App extends EventEmitter {
     let tempUnit = celsius ? "C" : "F";
     let attrSnakeCase = attribute.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
     let stateTopic = `controlmyspa/${spaId}/spa`;
-    let objectId = `controlmyspa_${spaId}_${attrSnakeCase}`;
-    let uniqueId = `${objectId}_sensor`;
+    let objectId = `${spaId}_${attrSnakeCase}`;
+    let uniqueId = `controlmyspa_${objectId}_sensor`;
     let valueTemplate = `{% if value_json.${attribute} is defined %}{{ value_json.${attribute} }}{% else %}unknown{% endif %}`
     let config = {
       "unique_id": uniqueId,
@@ -380,8 +380,8 @@ class App extends EventEmitter {
     let mode1Capitalized = mode1.charAt(0).toUpperCase()+mode1.slice(1).toLowerCase();
     let mode2Capitalized = mode2.charAt(0).toUpperCase()+mode2.slice(1).toLowerCase();
     let stateTopic = `controlmyspa/${spaId}/spa`;
-    let objectId = `controlmyspa_${spaId}_${attrSnakeCase}`;
-    let uniqueId = `${objectId}_sensor`;
+    let objectId = `${spaId}_${attrSnakeCase}`;
+    let uniqueId = `controlmyspa_${objectId}_sensor`;
     let valueTemplate = `{% if value_json.${attribute} is defined and value_json.${attribute} == "${mode1}"%}${mode1Capitalized}{% elif value_json.${attribute} is defined and value_json.${attribute} == "${mode2}" %}${mode2Capitalized}{% else %}unknown{% endif %}`
     let config = {
       "unique_id": uniqueId,
@@ -401,8 +401,8 @@ class App extends EventEmitter {
     let spaId = spa.getSpaId();
     let attrSnakeCase = attribute.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
     let commandTopic = `controlmyspa/${spaId}/${attribute}`;
-    let objectId = `controlmyspa_${spaId}_${attrSnakeCase}`;
-    let uniqueId = `${objectId}_sensor`;
+    let objectId = `${spaId}_${attrSnakeCase}`;
+    let uniqueId = `controlmyspa_${objectId}_sensor`;
 
     let config = {
       "unique_id": uniqueId,
@@ -446,14 +446,14 @@ class App extends EventEmitter {
     let self = this;
     let spaId = spa.getSpaId();
     let useCelsius = spa.useCelsius();
-    let name = 'ControlMySpa';
+    let name = null;
     let topicPrefix = `controlmyspa/${spaId}`;
     let stateTopic = `${topicPrefix}/spa`;
     let modeCommandTopic = `${topicPrefix}/heaterMode`;
     let tempCommandTopic = `${topicPrefix}/temp`;
     let actionTopic = `${topicPrefix}/heating/0`;
-    let objectId = `controlmyspa_${spaId}`;
-    let uniqueId = `${objectId}_climate`;
+    let objectId = `${spaId}`;
+    let uniqueId = `controlmyspa_${objectId}_climate`;
     let modes = ["off", "heat"];
     let tempStep = useCelsius ? 0.5 : 1;
     let precision = useCelsius ? 0.5 : 1;
