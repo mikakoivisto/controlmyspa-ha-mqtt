@@ -39,13 +39,10 @@ class App extends EventEmitter {
     this.config = config;
     let spaClient = new ControlMySpa(config.spaUser, config.spaPassword, config.useCelsius);
     this.spa = new Spa(spaClient, config);
+    this.registerSpaEventListeners();
     this.spa.init();
     this.spa.on('initialized', () => {
-      this.registerEventListeners();
-      if (this.mqtt.connected) {
-        this.mqttConnected();
-      }
-      this.startPollers();
+
     });
   }
 
@@ -62,7 +59,7 @@ class App extends EventEmitter {
     this.mqtt.subscribe(config.hassTopic);
   }
 
-  registerEventListeners() { 
+  registerMqttEventListeners() {
     let self = this;   
     self.mqtt.on('connect', () => {
       self.mqttConnected();
@@ -81,9 +78,18 @@ class App extends EventEmitter {
       self.handleMessage(topic, message.toString());
     });
 
+  }
+
+  registerSpaEventListeners() { 
+    let self = this;  
     self.spa.on('initialized', () => {
-      logInfo("Spa initialized")
+      logInfo("Spa initialized");
       self.setupSubscriptions();
+      self.registerMqttEventListeners();
+      if (self.mqtt.connected) {
+        self.mqttConnected();
+      }
+      self.startPollers();
       self.discovery();
     });
 
