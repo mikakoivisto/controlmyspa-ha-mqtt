@@ -518,7 +518,7 @@ class App extends EventEmitter {
         self.toggleHeaterMode(payload);
         break;
       case 'tempRange':
-        self.setTempRange(payload);
+        self.toggleTempRange(payload);
         break;
       case 'temp':
         self.setTemp(payload);
@@ -545,9 +545,14 @@ class App extends EventEmitter {
     self.spa.toggleHeaterMode();
   }
 
-  setTempRange(payload) {
+  toggleTempRange(payload) {
     let self = this;
-    self.spa.setTempRange("HIGH" === payload);
+    if self.spa.getTempRange() === "HIGH" {
+      self.spa.setTempRange("LOW");
+    }
+    else {
+      self.spa.setTempRange("HIGH");
+    }
   }
 
   setTemp(payload) {
