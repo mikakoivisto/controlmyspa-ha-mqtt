@@ -322,6 +322,7 @@ class App extends EventEmitter {
     self.modeSensorDiscovery(spa, "Heater Mode", "mdi:radiator", "heaterMode", "REST", "READY");
     self.modeSensorDiscovery(spa, "Temperature Range", "mdi:thermometer-lines", "tempRange", "HIGH", "LOW");
     self.buttonDiscovery(spa, "Toggle Heater Mode", "mdi:radiator", "heaterMode", "TOGGLE");
+    self.buttonDiscovery(spa, "Toggle Temperature Range", "mdi:thermometer-lines", "tempRange", "TOGGLE");
     self.buttonDiscovery(spa, "Refresh", "mdi:sync", "refresh", "REFRESH");
   }
 
