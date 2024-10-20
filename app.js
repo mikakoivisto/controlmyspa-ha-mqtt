@@ -548,10 +548,10 @@ class App extends EventEmitter {
   toggleTempRange(payload) {
     let self = this;
     if (self.spa.getTempRange() === "HIGH") {
-      self.spa.setTempRange("LOW");
+      self.spa.setTempRange(false);
     }
     else {
-      self.spa.setTempRange("HIGH");
+      self.spa.setTempRange(true);
     }
   }
 
