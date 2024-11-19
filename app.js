@@ -355,7 +355,7 @@ class App extends EventEmitter {
   temperatureSensorDiscovery(spa, name, attribute, celsius) {
     let self = this;
     let spaId = spa.getSpaId();
-    let tempUnit = celsius ? "C" : "F";
+    let tempUnit = celsius ? "°C" : "°F";
     let attrSnakeCase = attribute.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
     let stateTopic = `controlmyspa/${spaId}/spa`;
     let objectId = `${spaId}_${attrSnakeCase}`;
@@ -461,7 +461,7 @@ class App extends EventEmitter {
     let modes = ["off", "heat"];
     let tempStep = useCelsius ? 0.5 : 1;
     let precision = useCelsius ? 0.5 : 1;
-    let tempUnit = useCelsius ? "C" : "F";
+    let tempUnit = useCelsius ? "°C" : "°F";
     let minTemp = spa.getRangeLowTemp();
     let maxTemp = spa.getRangeHighTemp();
 
