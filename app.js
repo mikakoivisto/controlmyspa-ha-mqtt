@@ -355,7 +355,7 @@ class App extends EventEmitter {
   temperatureSensorDiscovery(spa, name, attribute, celsius) {
     let self = this;
     let spaId = spa.getSpaId();
-    let tempUnit = celsius ? "C" : "F";
+    let tempUnit = celsius ? "°C" : "°F";
     let attrSnakeCase = attribute.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
     let stateTopic = `controlmyspa/${spaId}/spa`;
     let objectId = `${spaId}_${attrSnakeCase}`;
