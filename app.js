@@ -205,7 +205,7 @@ class App extends EventEmitter {
     let topicPrefix = `controlmyspa/${spaId}`;
     let componentTopic = `${topicPrefix}/${type}`;
     let objectId = `${spaId}_${type}`;
-    if ("port" in component) {
+    if ("port" in component && component.port != undefined) {
       componentTopic += "/" + component.port;
       objectId += "_" + component.port;
       name += " " +  (parseInt(component.port) + 1)
@@ -236,7 +236,8 @@ class App extends EventEmitter {
     let topicPrefix = `controlmyspa/${spaId}`;
     let stateTopic = `${topicPrefix}/${type}`;
     let objectId = `${spaId}_${type}`;
-    if ("port" in component) {
+    let port = component.port||"";
+    if ("port" in component && component.port != undefined) {
       stateTopic += "/" + component.port;
       objectId += "_" + component.port;
       name += " " +  (parseInt(component.port) + 1)
@@ -275,7 +276,7 @@ class App extends EventEmitter {
       name += " " +  (parseInt(component.port) + 1)
     }
     let uniqueId = `controlmyspa_${objectId}_sensor`;
-    let valueTemplate = `{% if value_json.value == "${mode1}"%}${mode1Capitalized}{% elif value_json.value == "${mode2}" %}${mode2Capitalized}{% elif value_json.value == "${mode3}" %}${mode3Capitalized}{% else %}unknown{% endif %}`
+    let valueTemplate = mode3 ? `{% if value_json.value == "${mode1}"%}${mode1Capitalized}{% elif value_json.value == "${mode2}" %}${mode2Capitalized}{% elif value_json.value == "${mode3}" %}${mode3Capitalized}{% else %}unknown{% endif %}` : `{% if value_json.value == "${mode1}"%}${mode1Capitalized}{% elif value_json.value == "${mode2}" %}${mode2Capitalized}{% else %}unknown{% endif %}`
     let config = {
       "unique_id": uniqueId,
       "object_id": objectId,
@@ -319,7 +320,7 @@ class App extends EventEmitter {
     self.temperatureSensorDiscovery(spa, "Current Temperature", "currentTemp", celsius);
     self.temperatureSensorDiscovery(spa, "Target Temperature", "targetDesiredTemp", celsius);
     self.temperatureSensorDiscovery(spa, "Desired Temperature", "desiredTemp", celsius);
-    self.modeSensorDiscovery(spa, "Heater Mode", "mdi:radiator", "heaterMode", "REST", "READY");
+    self.modeSensorDiscovery(spa, "Heater Mode", "mdi:radiator", "heaterMode", "REST", "READY", "READY_REST");
     self.modeSensorDiscovery(spa, "Temperature Range", "mdi:thermometer-lines", "tempRange", "HIGH", "LOW");
     self.buttonDiscovery(spa, "Toggle Heater Mode", "mdi:radiator", "heaterMode", "TOGGLE");
     self.buttonDiscovery(spa, "Toggle Temperature Range", "mdi:thermometer-lines", "tempRange", "TOGGLE");
@@ -377,16 +378,25 @@ class App extends EventEmitter {
     self.mqtt.publish("homeassistant/sensor/" + objectId + "/config", JSON.stringify(config), { retain: true });
   }
 
-  modeSensorDiscovery(spa, name, icon, attribute, mode1, mode2) {
+  modeSensorDiscovery(spa, name, icon, attribute, mode1, mode2, mode3 = undefined) {
     let self = this;
     let spaId = spa.getSpaId();
     let attrSnakeCase = attribute.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-    let mode1Capitalized = mode1.charAt(0).toUpperCase()+mode1.slice(1).toLowerCase();
-    let mode2Capitalized = mode2.charAt(0).toUpperCase()+mode2.slice(1).toLowerCase();
+    let capitalizeMode = (mode) => {
+      if (!mode || typeof mode !== 'string') return '';
+      return mode
+        .toLowerCase()
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    };
+    let mode1Capitalized = capitalizeMode(mode1);
+    let mode2Capitalized = capitalizeMode(mode2);
+    let mode3Capitalized = capitalizeMode(mode3);
     let stateTopic = `controlmyspa/${spaId}/spa`;
     let objectId = `${spaId}_${attrSnakeCase}`;
     let uniqueId = `controlmyspa_${objectId}_sensor`;
-    let valueTemplate = `{% if value_json.${attribute} is defined and value_json.${attribute} == "${mode1}"%}${mode1Capitalized}{% elif value_json.${attribute} is defined and value_json.${attribute} == "${mode2}" %}${mode2Capitalized}{% else %}unknown{% endif %}`
+    let valueTemplate = mode3 ? `{% if value_json.${attribute} is defined and value_json.${attribute} == "${mode1}"%}${mode1Capitalized}{% elif value_json.${attribute} is defined and value_json.${attribute} == "${mode2}" %}${mode2Capitalized}{% elif value_json.${attribute} == "${mode3}" %}${mode3Capitalized}{% else %}unknown{% endif %}` : `{% if value_json.${attribute} is defined and value_json.${attribute} == "${mode1}"%}${mode1Capitalized}{% elif value_json.${attribute} is defined and value_json.${attribute} == "${mode2}" %}${mode2Capitalized}{% else %}unknown{% endif %}`
     let config = {
       "unique_id": uniqueId,
       "object_id": objectId,
@@ -473,7 +483,7 @@ class App extends EventEmitter {
       "modes": modes,
       "mode_command_topic": modeCommandTopic,
       "mode_state_topic": stateTopic,
-      "mode_state_template": "{% if value_json.heaterMode == \"REST\" %}off{% else %}heat{% endif %}",
+      "mode_state_template": "{% if value_json.heaterMode == \"REST\" or value_json.heaterMode == \"READY_REST\" %}off{% else %}heat{% endif %}",
       "temperature_command_topic": tempCommandTopic,
       "temperature_state_topic": stateTopic,
       "temperature_state_template": "{% if value_json.desiredTemp is defined %}{{ value_json.desiredTemp }}{% elif value_json.targetDesiredTemp is defined  %}{{ value_json.targetDesiredTemp }}{% else %}unknown{% endif %}",
