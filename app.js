@@ -323,6 +323,7 @@ class App extends EventEmitter {
     self.modeSensorDiscovery(spa, "Heater Mode", "mdi:radiator", "heaterMode", "REST", "READY", "READY_REST");
     self.modeSensorDiscovery(spa, "Temperature Range", "mdi:thermometer-lines", "tempRange", "HIGH", "LOW");
     self.buttonDiscovery(spa, "Toggle Heater Mode", "mdi:radiator", "heaterMode", "TOGGLE");
+    self.buttonDiscovery(spa, "Toggle Temperature Range", "mdi:thermometer-lines", "tempRange", "TOGGLE");
     self.buttonDiscovery(spa, "Refresh", "mdi:sync", "refresh", "REFRESH");
   }
 
@@ -470,7 +471,7 @@ class App extends EventEmitter {
     let modes = ["off", "heat"];
     let tempStep = useCelsius ? 0.5 : 1;
     let precision = useCelsius ? 0.5 : 1;
-    let tempUnit = useCelsius ? "C" : "F";
+    let tempUnit = useCelsius ? "°C" : "°F";
     let minTemp = spa.getRangeLowTemp();
     let maxTemp = spa.getRangeHighTemp();
 
@@ -527,7 +528,7 @@ class App extends EventEmitter {
         self.toggleHeaterMode(payload);
         break;
       case 'tempRange':
-        self.setTempRange(payload);
+        self.toggleTempRange(payload);
         break;
       case 'temp':
         self.setTemp(payload);
@@ -554,9 +555,14 @@ class App extends EventEmitter {
     self.spa.toggleHeaterMode();
   }
 
-  setTempRange(payload) {
+  toggleTempRange(payload) {
     let self = this;
-    self.spa.setTempRange("HIGH" === payload);
+    if (self.spa.getTempRange() === "HIGH") {
+      self.spa.setTempRange(false);
+    }
+    else {
+      self.spa.setTempRange(true);
+    }
   }
 
   setTemp(payload) {
