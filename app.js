@@ -528,7 +528,7 @@ class App extends EventEmitter {
         self.toggleHeaterMode(payload);
         break;
       case 'tempRange':
-        self.setTempRange(payload);
+        self.toggleTempRange(payload);
         break;
       case 'temp':
         self.setTemp(payload);
