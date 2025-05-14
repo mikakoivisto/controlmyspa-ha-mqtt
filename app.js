@@ -555,7 +555,7 @@ class App extends EventEmitter {
     self.spa.toggleHeaterMode();
   }
 
-  setTempRange(payload) {
+  toggleTempRange(payload) {
     let self = this;
     self.spa.setTempRange("HIGH" === payload);
   }
