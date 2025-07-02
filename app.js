@@ -104,6 +104,7 @@ class App extends EventEmitter {
     self.mqtt.subscribe(`${topicPrefix}/tempRange`);
     self.mqtt.subscribe(`${topicPrefix}/temp`);
     self.mqtt.subscribe(`${topicPrefix}/panelLock`);
+    self.mqtt.subscribe(`${topicPrefix}/timeSync`);
     self.spa.getLights().forEach(light => {
       self.mqtt.subscribe(`${topicPrefix}/light/${light.port}/set`);
     });
@@ -112,6 +113,13 @@ class App extends EventEmitter {
     });
     self.spa.getPumps().forEach(pump => {
       self.mqtt.subscribe(`${topicPrefix}/pump/${pump.port}/set`);
+    });
+    self.spa.getFilters().forEach(filter => {
+      self.mqtt.subscribe(`${topicPrefix}/filter/${filter.port}/time/set`);
+      self.mqtt.subscribe(`${topicPrefix}/filter/${filter.port}/duration/set`);
+      if (filter.port == 1) {
+        self.mqtt.subscribe(`${topicPrefix}/filter/${filter.port}/enabled/set`);
+      }
     });
   }
 
@@ -129,6 +137,7 @@ class App extends EventEmitter {
       panelLocked: self.spa.isPanelLocked(),
       minTemp: self.spa.getRangeLowTemp(),
       maxTemp: self.spa.getRangeHighTemp(),
+      time: self.spa.getTime(),
       device: self.spa.getDeviceInfo(),
       owner: self.spa.getOwnerInfo()
     };
@@ -159,8 +168,17 @@ class App extends EventEmitter {
       self.mqtt.publish(`${topicPrefix}/heater/${heater.port}`, JSON.stringify(heater), { retain: true });
     });
     self.spa.getFilters().forEach(filter => {
+      const filterTopic = `${topicPrefix}/filter/${filter.port}`;
       logDebug(`Publishing filter state: ${JSON.stringify(filter)}`);
-      self.mqtt.publish(`${topicPrefix}/filter/${filter.port}`, JSON.stringify(filter), { retain: true });
+      const startTime = `${filter.hour.toString().padStart(2, '0')}:${filter.minute.toString().padStart(2, '0')}`;
+      const duration = filter.durationMinutes;
+      self.mqtt.publish(`${filterTopic}`, JSON.stringify(filter), { retain: true });
+      self.mqtt.publish(`${filterTopic}/time`, startTime, { retain: true });
+      self.mqtt.publish(`${filterTopic}/duration`, duration.toString(), { retain: true });
+      if (filter.port == 1) {
+        const isEnabled = filter.value === "ON" || filter.value === "OFF";
+        self.mqtt.publish(`${filterTopic}/enabled`, isEnabled.toString(), { retain: true });
+      }
     });
   }
 
@@ -193,6 +211,7 @@ class App extends EventEmitter {
       self.componentBinarySensorDiscovery(self.spa, heater, "heater", "mdi:radiator", "ON");
     });
     self.spa.getFilters().forEach(filter => {
+      self.componentFilterDiscovery(self.spa, filter, "filter", "mdi:air-filter");
       self.componentSensorDiscovery(self.spa, filter, "filter", "mdi:air-filter", "ON", "OFF", "DISABLED");
     });
     logInfo("Ending mqtt discovery");
@@ -260,6 +279,75 @@ class App extends EventEmitter {
     self.mqtt.publish("homeassistant/binary_sensor/" + objectId + "/config", JSON.stringify(config), { retain: true });
   }
 
+  componentFilterDiscovery(spa, component, type, icon) {
+    const self = this;
+    const spaId = spa.getSpaId();
+    const port = component.port;
+    const topicPrefix = `controlmyspa/${spaId}/${type}/${port}`;
+    const objectIdPrefix = `${spaId}_${type}_${port}`;
+    const namePrefix = `${type.charAt(0).toUpperCase()}${type.slice(1).replace('_', ' ')}`;
+    const nameSuffix = ` ${parseInt(port) + 1}`;
+
+    // 15min interval 24h
+    const times = [];
+    for (let h = 0; h < 24; h++) {
+      for (let m = 0; m < 60; m += 15) {
+        const hh = h.toString().padStart(2, '0');
+        const mm = m.toString().padStart(2, '0');
+        times.push(`${hh}:${mm}`);
+      }
+    }
+
+    // 1. Start time (select)
+    const configTime = {
+      unique_id: `${objectIdPrefix}_time_select`,
+      object_id: `${objectIdPrefix}_time`,
+      name: `${namePrefix}${nameSuffix} Start Time`,
+      icon: icon || "mdi:clock-outline",
+      command_topic: `${topicPrefix}/time/set`,
+      state_topic: `${topicPrefix}/time`,
+      options: times,
+      availability: self.getAvailabilityDiscovery(spa),
+      device: self.getDeviceDiscovery(spa)
+    };
+    self.mqtt.publish(`homeassistant/select/${objectIdPrefix}_time/config`, JSON.stringify(configTime), { retain: true });
+
+    // 2. Duration (number)
+    const configDuration = {
+      unique_id: `${objectIdPrefix}_duration_number`,
+      object_id: `${objectIdPrefix}_duration`,
+      name: `${namePrefix}${nameSuffix} Duration`,
+      icon: icon || "mdi:timer-outline",
+      command_topic: `${topicPrefix}/duration/set`,
+      state_topic: `${topicPrefix}/duration`,
+      min: 15,
+      max: 240,
+      step: 15,
+      unit_of_measurement: "min",
+      availability: self.getAvailabilityDiscovery(spa),
+      device: self.getDeviceDiscovery(spa)
+    };
+    self.mqtt.publish(`homeassistant/number/${objectIdPrefix}_duration/config`, JSON.stringify(configDuration), { retain: true });
+
+    // 3. Enabled (switch)
+    if (port == 1) { // Only port 1 has enabled switch
+      const configEnabled = {
+        unique_id: `${objectIdPrefix}_enabled_switch`,
+        object_id: `${objectIdPrefix}_enabled`,
+        name: `${namePrefix}${nameSuffix} Enabled`,
+        icon: icon || "mdi:check-circle-outline",
+        state_topic: `${topicPrefix}/enabled`,
+        command_topic: `${topicPrefix}/enabled/set`,
+        payload_on: "true",
+        payload_off: "false",
+        availability: self.getAvailabilityDiscovery(spa),
+        device: self.getDeviceDiscovery(spa)
+      };
+      self.mqtt.publish(`homeassistant/switch/${objectIdPrefix}_enabled/config`, JSON.stringify(configEnabled), { retain: true });
+    }
+
+  }
+
   componentSensorDiscovery(spa, component, type, icon, mode1, mode2, mode3) {
     let self = this;
     let spaId = spa.getSpaId();
@@ -324,6 +412,7 @@ class App extends EventEmitter {
     self.modeSensorDiscovery(spa, "Temperature Range", "mdi:thermometer-lines", "tempRange", "HIGH", "LOW");
     self.buttonDiscovery(spa, "Toggle Heater Mode", "mdi:radiator", "heaterMode", "TOGGLE");
     self.buttonDiscovery(spa, "Refresh", "mdi:sync", "refresh", "REFRESH");
+    self.buttonDiscovery(spa, "Time Sync", "mdi:clock-sync", "timeSync", "SYNC");
   }
 
   panelLockDiscovery(spa) {
@@ -514,9 +603,17 @@ class App extends EventEmitter {
     let parts = topic.split("/");
     let id;
     let command = parts.pop();
+    let subCommand;  
     if (command === "set") {
-      id = parts.pop();
-      command = parts.pop();
+      let last = parts.pop(); // either ID or subcommand
+      if (!isNaN(last)) {
+        id = last; // last part is ID
+        command = parts.pop(); // previous part is command
+      } else {
+        subCommand = last; // last part is subcommand
+        id = parts.pop(); // previous part is ID
+        command = parts.pop(); // previous part is command
+      }
     }
     
     switch(command) {
@@ -543,10 +640,32 @@ class App extends EventEmitter {
         break;
       case 'pump':
         self.setJetState(id, payload);
-        break;            
+        break;   
+      case 'filter':
+        self.setFilterSchedule(id, subCommand, payload);
+        break;
+      case 'timeSync':
+        self.syncTime();
+        break;
       default:
         logError(`Unrecognized command ${command}`)
     } 
+  }
+
+  setFilterSchedule(id, subCommand, payload) {
+    logDebug(`Setting filter schedule for id ${id}, subCommand ${subCommand}, payload ${payload}`);
+    let self = this;
+    if (!id || !subCommand) {
+      logError(`Invalid filter command: id or subCommand is missing`);
+      return;
+    }
+    self.spa.setFilterSchedule(id, subCommand, payload);
+  }
+
+  syncTime() {
+    let self = this;
+    logDebug("Syncing time with spa");
+    self.spa.syncTime();
   }
 
   toggleHeaterMode(payload) {
