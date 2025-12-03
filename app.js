@@ -293,7 +293,7 @@ class App extends EventEmitter {
   spaSensorDiscovery(spa) {
     let self = this;
     let spaId = spa.getSpaId();
-    let name = 'Spa';
+    let name = 'Spa gateway';
     let topicPrefix = `controlmyspa/${spaId}`;
     let stateTopic = `${topicPrefix}/spa`;
     let objectId = `${spaId}_spa`;
@@ -303,11 +303,11 @@ class App extends EventEmitter {
       "unique_id": uniqueId,
       "object_id": objectId,
       "name": name,
-      "icon": "mdi:hot-tub",
+      "icon": "mdi:web",
       "state_topic": stateTopic,
       "value_template": "{% if value_json.online is defined and value_json.online %} Online {% else %} Offline {% endif %}",
       "json_attributes_topic": stateTopic,
-      "availability": self.getAvailabilityDiscovery(spa),
+      "entity_category": "diagnostic",
       "device": self.getDeviceDiscovery(spa)
     };
     logDebug(`Send discover config for spa sensor: ${JSON.stringify(config)}`);
@@ -324,7 +324,7 @@ class App extends EventEmitter {
     self.modeSensorDiscovery(spa, "Temperature Range", "mdi:thermometer-lines", "tempRange", "HIGH", "LOW");
     self.buttonDiscovery(spa, "Toggle Heater Mode", "mdi:radiator", "heaterMode", "TOGGLE");
     self.buttonDiscovery(spa, "Toggle Temperature Range", "mdi:thermometer-lines", "tempRange", "TOGGLE");
-    self.buttonDiscovery(spa, "Refresh", "mdi:sync", "refresh", "REFRESH");
+    self.buttonDiscovery(spa, "Refresh", "mdi:sync", "refresh", "REFRESH", true, false);
   }
 
   panelLockDiscovery(spa) {
@@ -410,7 +410,7 @@ class App extends EventEmitter {
     self.mqtt.publish("homeassistant/sensor/" + objectId + "/config", JSON.stringify(config), { retain: true });
   }
 
-  buttonDiscovery(spa, name, icon, attribute, payload) {
+  buttonDiscovery(spa, name, icon, attribute, payload, diagnostic = false, availability = true) {
     let self = this;
     let spaId = spa.getSpaId();
     let attrSnakeCase = attribute.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
@@ -425,9 +425,14 @@ class App extends EventEmitter {
       "icon": icon,
       "command_topic": commandTopic,
       "payload_press": payload,
-      "availability": self.getAvailabilityDiscovery(spa),
       "device": self.getDeviceDiscovery(spa)
     };
+    if (diagnostic) {
+      config.entity_category = "diagnostic";
+    }
+    if (availability) {
+      config.availability = self.getAvailabilityDiscovery(spa);
+    }
     self.mqtt.publish("homeassistant/button/" + objectId + "/config", JSON.stringify(config), { retain: true });
   }
 
@@ -528,7 +533,7 @@ class App extends EventEmitter {
         self.toggleHeaterMode(payload);
         break;
       case 'tempRange':
-        self.toggleTempRange(payload);
+        self.setTempRange(payload);
         break;
       case 'temp':
         self.setTemp(payload);
@@ -555,10 +560,13 @@ class App extends EventEmitter {
     self.spa.toggleHeaterMode();
   }
 
-  toggleTempRange(payload) {
+  setTempRange(payload) {
     let self = this;
-    self.spa.setTempRange("HIGH" === payload);
-    self.spa.setTempRange(true);
+    if("TOGGLE" === payload) {
+      self.spa.toggleTempRange();
+    } else {
+      self.spa.setTempRange("HIGH" === payload);
+    }
   }
 
   setTemp(payload) {
