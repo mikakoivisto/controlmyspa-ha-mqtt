@@ -26,6 +26,7 @@ class App extends EventEmitter {
   mqtt;
   spa;
   config;
+  tempRange;
   constructor(config) {
     super();
 
@@ -91,8 +92,14 @@ class App extends EventEmitter {
     });
 
     self.spa.on('status_updated', () => {
-      logDebug("Spa updated")
+      logDebug("Spa updated");
       self.publishSpaState();
+    });
+
+    self.spa.on('temp_range_updated', () => {
+      logDebug("Temp range updated");
+      self.tempRange = self.spa.getTempRange();
+      self.climateDiscovery(self.spa);
     });
   }
 
@@ -141,6 +148,9 @@ class App extends EventEmitter {
       device: self.spa.getDeviceInfo(),
       owner: self.spa.getOwnerInfo()
     };
+    if (self.tempRange !== self.spa.getTempRange()) {
+      self.spa.emit('temp_range_updated');
+    }
     logDebug(`Publishing spa state: ${JSON.stringify(state)}`);
     self.mqtt.publish(`${topicPrefix}/spa`, JSON.stringify(state), { retain: true });
     self.spa.getLights().forEach(light => {
@@ -185,6 +195,7 @@ class App extends EventEmitter {
   discovery() {
     let self = this;
     logInfo("Starting mqtt discovery");
+    self.tempRange = self.spa.getTempRange();
     self.spaSensorDiscovery(self.spa);
     self.sensorsDiscovery(self.spa);
     self.climateDiscovery(self.spa);
